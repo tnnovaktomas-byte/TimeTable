@@ -3,6 +3,7 @@ package cz.uhk.timetable.gui;
 import cz.uhk.timetable.model.LocationTimetable;
 import cz.uhk.timetable.utils.ITimetableProvider;
 import cz.uhk.timetable.utils.MockTimetableProvider;
+import cz.uhk.timetable.utils.StagTimetableProvider;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -10,7 +11,7 @@ import javax.swing.table.TableModel;
 import java.awt.*;
 
 public class TimetableFrame extends JFrame {
-    private ITimetableProvider timetableProvider = new MockTimetableProvider();
+    private ITimetableProvider timetableProvider = new StagTimetableProvider();
     private LocationTimetable timetable;
     private JTable tabTimetable;
     private TimetableModel timetableModel;
