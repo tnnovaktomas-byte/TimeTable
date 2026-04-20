@@ -35,6 +35,10 @@ public class TimetableFrame extends JFrame {
 
     class TimetableModel extends AbstractTableModel {
 
+        private static final String[] COLNAMES = {
+                "ZKRATKA", "NAZEV", "UCITEL", "TYP", "DEN", "ZACATEK", "KONEC"
+        };
+
         @Override
         public int getRowCount() {
             return timetable.getActivities().size();
@@ -46,18 +50,23 @@ public class TimetableFrame extends JFrame {
         }
 
         @Override
+        public String getColumnName(int column) {
+            return COLNAMES[column];
+        }
+
+        @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             var a = timetable.getActivities().get(rowIndex);
-            switch (columnIndex) {
-                case 0 : return a.getId();
-                case 1 : return a.getName();
-                case 2 : return a.getTeacher();
-                case 3 : return a.getType();
-                case 4 : return a.getDay();
-                case 5 : return a.getStart();
-                case 6 : return a.getEnd();
-            }
-            return "";
+            return switch (columnIndex) {
+                case 0 -> a.getId();
+                case 1 -> a.getName();
+                case 2 -> a.getTeacher();
+                case 3 -> a.getType();
+                case 4 -> a.getDay();
+                case 5 -> a.getStart();
+                case 6 -> a.getEnd();
+                default -> "";
+            };
         }
     }
 }

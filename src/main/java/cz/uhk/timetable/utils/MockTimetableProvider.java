@@ -22,6 +22,16 @@ public class MockTimetableProvider implements ITimetableProvider {
                 LocalTime.of(13,05)
         ));
 
+        tt.getActivities().add(new Activity(
+                "ZMI2",
+                "Základy Matematiky 2",
+                "Bauer",
+                "Pondělí",
+                "Přednáška",
+                LocalTime.of(10,00),
+                LocalTime.of(11,30)
+        ));
+
         return tt;
     }
 }
