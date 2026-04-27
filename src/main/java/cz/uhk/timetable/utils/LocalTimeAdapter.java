@@ -20,6 +20,6 @@ public class LocalTimeAdapter extends TypeAdapter<LocalTime> {
         in.nextName();
         var timeStr = in.nextString();
         in.endObject();
-        return LocalTime.parse(timeStr); //TODO control!
+        return LocalTime.parse(timeStr);
     }
 }

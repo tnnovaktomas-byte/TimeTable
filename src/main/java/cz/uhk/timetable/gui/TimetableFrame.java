@@ -15,6 +15,10 @@ public class TimetableFrame extends JFrame {
     private LocationTimetable timetable;
     private JTable tabTimetable;
     private TimetableModel timetableModel;
+    private JComboBox buildingBox;
+    private JComboBox roomBox;
+
+    //The URL for the new STAG shite: https://stag-demo.uhk.cz/ws/services/rest2/mistnost/getMistnostiInfo?zkrBudovy=%&pracoviste=%&typ=U&outputFormat=JSON&cisloMistnosti=% (Taken 25 after % bcs ascii)
 
     public TimetableFrame() {
         super("Location Timetable");
@@ -30,9 +34,12 @@ public class TimetableFrame extends JFrame {
         timetableModel = new TimetableModel();
         tabTimetable = new JTable(timetableModel);
         add(new JScrollPane(tabTimetable), BorderLayout.CENTER);
+        add(new JToolBar(), BorderLayout.NORTH);
 
         pack();
     }
+
+    //cez toolbar
 
     class TimetableModel extends AbstractTableModel {
 
