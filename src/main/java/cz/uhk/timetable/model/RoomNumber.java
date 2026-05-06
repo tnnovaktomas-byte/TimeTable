@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.time.LocalTime;
 
 /**
- * POJO Timetable activity
+ * POJO Timetable roomNumber
  */
 
 public class RoomNumber {
@@ -44,6 +44,4 @@ public class RoomNumber {
                 ", roomID='" + roomID + '\'' +
                 '}';
     }
-
-
 }

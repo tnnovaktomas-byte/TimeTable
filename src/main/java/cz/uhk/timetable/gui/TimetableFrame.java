@@ -3,6 +3,7 @@ package cz.uhk.timetable.gui;
 import cz.uhk.timetable.model.LocationTimetable;
 import cz.uhk.timetable.utils.ITimetableProvider;
 import cz.uhk.timetable.utils.MockTimetableProvider;
+import cz.uhk.timetable.utils.StagRoomProvider;
 import cz.uhk.timetable.utils.StagTimetableProvider;
 
 import javax.swing.*;
@@ -17,6 +18,7 @@ public class TimetableFrame extends JFrame {
     private TimetableModel timetableModel;
     private JComboBox buildingBox;
     private JComboBox roomBox;
+    private StagRoomProvider roomProvider = new StagRoomProvider(); // New provider instance
 
     //The URL for the new STAG shite: https://stag-demo.uhk.cz/ws/services/rest2/mistnost/getMistnostiInfo?zkrBudovy=%&pracoviste=%&typ=U&outputFormat=JSON&cisloMistnosti=% (Taken 25 after % bcs ascii)
 
@@ -35,23 +37,22 @@ public class TimetableFrame extends JFrame {
         tabTimetable = new JTable(timetableModel);
         add(new JScrollPane(tabTimetable), BorderLayout.CENTER);
 
-        // Toolbar for picking building
         JToolBar toolBar = new JToolBar();
         toolBar.setFloatable(false);
 
-        // Initialize and populate the combo box
-        buildingBox = new JComboBox<>(new String[]{"J", "B", "C"});
+        buildingBox = new JComboBox<>(new String[]{"A", "B", "C", "H", "J"});
         buildingBox.addActionListener(e -> {
             String selectedBuilding = (String) buildingBox.getSelectedItem();
-            timetable = timetableProvider.readTimetable(selectedBuilding, ""); // adjust room as needed
-            timetableModel.fireTableDataChanged(); // refresh the table
+            updateRoomList(selectedBuilding);
         });
 
-        roomBox = new JComboBox<>(new String[]{"J22", "J10"});
+        roomBox = new JComboBox<>();
         roomBox.addActionListener(e -> {
             String selectedRoom = (String) roomBox.getSelectedItem();
-            timetable = timetableProvider.readTimetable("", selectedRoom);
-            timetableModel.fireTableDataChanged();
+            String selectedBuilding = (String) buildingBox.getSelectedItem();
+            if (selectedRoom != null) {
+                timetable = timetableProvider.readTimetable(selectedBuilding, selectedRoom);
+            }
         });
 
         JButton btnRefresh = new JButton("Refresh");
@@ -65,17 +66,36 @@ public class TimetableFrame extends JFrame {
         toolBar.add(new JLabel("Building: "));
         toolBar.add(buildingBox);
         toolBar.addSeparator();
+        toolBar.add(new JLabel("Room: "));
         toolBar.add(roomBox);
         toolBar.addSeparator();
         toolBar.add(btnRefresh);
 
         add(toolBar, BorderLayout.NORTH);
 
+        updateRoomList((String) buildingBox.getSelectedItem());
+
         pack();
         setVisible(true);
     }
 
-    //cez toolbar
+    /**
+     * Bridges StagRoomProvider and roomBox.
+     */
+    private void updateRoomList(String building) {
+        StagRoomProvider roomProvider = new StagRoomProvider();
+        java.util.List<cz.uhk.timetable.model.RoomNumber> rooms = roomProvider.getRooms(building);
+
+        var listeners = roomBox.getActionListeners();
+        for (var l : listeners) roomBox.removeActionListener(l);
+
+        roomBox.removeAllItems();
+        for (var room : rooms) {
+            roomBox.addItem(room.getRoomID()); // Uses RoomNumber.java[cite: 9]
+        }
+
+        for (var l : listeners) roomBox.addActionListener(l);
+    }
 
     class TimetableModel extends AbstractTableModel {
 

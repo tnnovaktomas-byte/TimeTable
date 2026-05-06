@@ -2,37 +2,36 @@ package cz.uhk.timetable.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import cz.uhk.timetable.model.LocationTimetable;
+import cz.uhk.timetable.model.RoomNumber;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-public class StagRoomProvider implements ITimetableProvider {
-    //Static jen jedna instance, final že se nemění
-    private static final String ROOM_URL="https://stag-demo.uhk.cz/ws/services/rest2/mistnost/getMistnostiInfo?zkrBudovy=%S&pracoviste=%%25&typ=U&outputFormat=JSON&cisloMistnosti=%%25";
+public class StagRoomProvider {
+    private static final String ROOM_URL = "https://stag-demo.uhk.cz/ws/services/rest2/mistnost/getMistnostiInfo?zkrBudovy=%s&pracoviste=%%25&typ=U&outputFormat=JSON&cisloMistnosti=%%25";
     private final Gson gson = new Gson();
 
-    public StagRoomProvider() {
-        gson = new GsonBuilder().registerTypeAdapter(LocalTime.class, new LocalTimeAdapter()).create();
-    }
-
-    @Override
-    public LocationTimetable readTimetable(String building, String room) {
-
+    /**
+     * Fetches list of rooms for a specific building
+     */
+    public List<RoomNumber> getRooms(String building) {
         try {
-            var url = new URL(ROOM_URL.formatted(building, room));
+            var url = new URL(String.format(ROOM_URL, building));
             var reader = new InputStreamReader(url.openStream());
 
-            return gson.fromJson(reader, LocationTimetable.class);
-        } catch (MalformedURLException exception) {
-            System.out.println("Wrong URL");
-            throw new RuntimeException(exception);
+            Map<String, List<RoomNumber>> response = gson.fromJson(reader,
+                    new TypeToken<Map<String, List<RoomNumber>>>(){}.getType());
+
+            return response.getOrDefault("mistnostInfo", new ArrayList<>());
         } catch (IOException e) {
-            System.out.println("IO Error during timetable reading");
-            throw new RuntimeException(e);
+            System.err.println("Error fetching rooms for building: " + building);
+            return new ArrayList<>();
         }
     }
 }
