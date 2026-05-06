@@ -18,16 +18,14 @@ public class TimetableFrame extends JFrame {
     private TimetableModel timetableModel;
     private JComboBox buildingBox;
     private JComboBox roomBox;
-    private StagRoomProvider roomProvider = new StagRoomProvider(); // New provider instance
-
-    //The URL for the new STAG shite: https://stag-demo.uhk.cz/ws/services/rest2/mistnost/getMistnostiInfo?zkrBudovy=%&pracoviste=%&typ=U&outputFormat=JSON&cisloMistnosti=% (Taken 25 after % bcs ascii)
+    private StagRoomProvider roomProvider = new StagRoomProvider();
 
     public TimetableFrame() {
         super("Location Timetable");
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        timetable = timetableProvider.readTimetable("J", "J22");
+        timetable = timetableProvider.readTimetable("A", "AULA");
 
         initGui();
     }
@@ -86,12 +84,15 @@ public class TimetableFrame extends JFrame {
         StagRoomProvider roomProvider = new StagRoomProvider();
         java.util.List<cz.uhk.timetable.model.RoomNumber> rooms = roomProvider.getRooms(building);
 
+        rooms.sort((r1, r2) -> r1.getRoomID().compareToIgnoreCase(r2.getRoomID()));
+
         var listeners = roomBox.getActionListeners();
         for (var l : listeners) roomBox.removeActionListener(l);
 
         roomBox.removeAllItems();
+
         for (var room : rooms) {
-            roomBox.addItem(room.getRoomID()); // Uses RoomNumber.java[cite: 9]
+            roomBox.addItem(room.getRoomID());
         }
 
         for (var l : listeners) roomBox.addActionListener(l);
