@@ -34,9 +34,45 @@ public class TimetableFrame extends JFrame {
         timetableModel = new TimetableModel();
         tabTimetable = new JTable(timetableModel);
         add(new JScrollPane(tabTimetable), BorderLayout.CENTER);
-        add(new JToolBar(), BorderLayout.NORTH);
+
+        // Toolbar for picking building
+        JToolBar toolBar = new JToolBar();
+        toolBar.setFloatable(false);
+
+        // Initialize and populate the combo box
+        buildingBox = new JComboBox<>(new String[]{"J", "B", "C"});
+        buildingBox.addActionListener(e -> {
+            String selectedBuilding = (String) buildingBox.getSelectedItem();
+            timetable = timetableProvider.readTimetable(selectedBuilding, ""); // adjust room as needed
+            timetableModel.fireTableDataChanged(); // refresh the table
+        });
+
+        roomBox = new JComboBox<>(new String[]{"J22", "J10"});
+        roomBox.addActionListener(e -> {
+            String selectedRoom = (String) roomBox.getSelectedItem();
+            timetable = timetableProvider.readTimetable("", selectedRoom);
+            timetableModel.fireTableDataChanged();
+        });
+
+        JButton btnRefresh = new JButton("Refresh");
+        btnRefresh.addActionListener(e -> {
+            String selectedBuilding = (String) buildingBox.getSelectedItem();
+            String selectedRoom = (String) roomBox.getSelectedItem();
+            timetable = timetableProvider.readTimetable(selectedBuilding, selectedRoom);
+            timetableModel.fireTableDataChanged();
+        });
+
+        toolBar.add(new JLabel("Building: "));
+        toolBar.add(buildingBox);
+        toolBar.addSeparator();
+        toolBar.add(roomBox);
+        toolBar.addSeparator();
+        toolBar.add(btnRefresh);
+
+        add(toolBar, BorderLayout.NORTH);
 
         pack();
+        setVisible(true);
     }
 
     //cez toolbar
